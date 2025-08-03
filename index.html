@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoTube - Video Sharing Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .video-thumbnail {
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            background: rgba(255, 0, 0, 0.9);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 20px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 4px;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .duration-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="flex items-center justify-between px-4 py-3">
+            <!-- Logo and Menu -->
+            <div class="flex items-center space-x-4">
+                <button class="p-2 hover:bg-gray-100 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-semibold">VideoTube</span>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="flex-1 max-w-2xl mx-8">
+                <div class="flex">
+                    <input type="text" placeholder="Search videos..." 
+                           class="flex-1 px-4 py-2 border border-gray-300 rounded-l-full focus:outline-none focus:border-blue-500">
+                    <button class="px-6 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-full hover:bg-gray-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- User Actions -->
+            <div class="flex items-center space-x-4">
+                <button class="p-2 hover:bg-gray-100 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                </button>
+                <button class="p-2 hover:bg-gray-100 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM16 3h5v5h-5V3zM4 3h6v6H4V3z"></path>
+                    </svg>
+                </button>
+                <button class="p-2 hover:bg-gray-100 rounded-full">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19h6v-6H4v6z"></path>
+                    </svg>
+                </button>
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                    U
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white h-screen sticky top-16 overflow-y-auto border-r border-gray-200">
+            <nav class="p-4">
+                <div class="space-y-1">
+                    <a href="#" class="sidebar-item flex items-center space-x-3 px-3 py-2 rounded-lg bg-gray-100">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                        </svg>
+                        <span class="font-medium">Home</span>
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center space-x-3 px-3 py-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>Trending</span>
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center space-x-3 px-3 py-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <span>Subscriptions</span>
+                    </a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="space-y-1">
+                    <a href="#" class="sidebar-item flex items-center space-x-3 px-3 py-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2M7 4h10M7 4l-2 16h14L17 4M9 9v6M15 9v6"></path>
+                        </svg>
+                        <span>Library</span>
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center space-x-3 px-3 py-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>History</span>
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center space-x-3 px-3 py-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        <span>Liked videos</span>
+                    </a>
+                    <a href="#" class="sidebar-item flex items-center space-x-3 px-3 py-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Watch later</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Category Tabs -->
+            <div class="flex space-x-4 mb-6 overflow-x-auto">
+                <button class="px-4 py-2 bg-black text-white rounded-full whitespace-nowrap">All</button>
+                <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full whitespace-nowrap">Music</button>
+                <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full whitespace-nowrap">Gaming</button>
+                <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full whitespace-nowrap">Technology</button>
+                <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full whitespace-nowrap">Education</button>
+                <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full whitespace-nowrap">Sports</button>
+                <button class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-full whitespace-nowrap">Comedy</button>
+            </div>
+
+            <!-- Video Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Video Card 1 -->
+                <div class="video-card bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="video-thumbnail">
+                        <div class="play-button cursor-pointer">
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="duration-badge">12:34</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex space-x-3">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                TC
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">
+                                    Building Modern Web Applications with React and TypeScript
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-1">Tech Channel</p>
+                                <p class="text-sm text-gray-500">1.2M views • 2 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Card 2 -->
+                <div class="video-card bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="video-thumbnail" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="play-button cursor-pointer">
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="duration-badge">8:45</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex space-x-3">
+                            <div class="w-10 h-10 bg-pink-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                MC
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">
+                                    Amazing Guitar Solo Performance - Live Concert
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-1">Music Central</p>
+                                <p class="text-sm text-gray-500">856K views • 1 week ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Card 3 -->
+                <div class="video-card bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="video-thumbnail" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="play-button cursor-pointer">
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="duration-badge">15:22</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex space-x-3">
+                            <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                GW
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">
+                                    Epic Gaming Moments - Best Highlights Compilation
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-1">Gaming World</p>
+                                <p class="text-sm text-gray-500">2.1M views • 3 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Card 4 -->
+                <div class="video-card bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="video-thumbnail" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="play-button cursor-pointer">
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="duration-badge">6:18</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex space-x-3">
+                            <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                CF
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">
+                                    Delicious Pasta Recipe - Easy 15 Minute Meal
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-1">Cooking Fun</p>
+                                <p class="text-sm text-gray-500">445K views • 5 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Card 5 -->
+                <div class="video-card bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="video-thumbnail" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                        <div class="play-button cursor-pointer">
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="duration-badge">22:15</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex space-x-3">
+                            <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                ED
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">
+                                    Understanding Quantum Physics - Beginner's Guide
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-1">EduDive</p>
+                                <p class="text-sm text-gray-500">678K views • 1 week ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Card 6 -->
+                <div class="video-card bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="video-thumbnail" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                        <div class="play-button cursor-pointer">
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="duration-badge">4:32</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex space-x-3">
+                            <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                SP
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">
+                                    Incredible Football Goals - Top 10 This Week
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-1">Sports Plus</p>
+                                <p class="text-sm text-gray-500">1.8M views • 1 day ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Card 7 -->
+                <div class="video-card bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="video-thumbnail" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                        <div class="play-button cursor-pointer">
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="duration-badge">11:07</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex space-x-3">
+                            <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                CC
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">
+                                    Hilarious Cat Compilation - Try Not to Laugh Challenge
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-1">Comedy Central</p>
+                                <p class="text-sm text-gray-500">3.2M views • 4 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video Card 8 -->
+                <div class="video-card bg-white rounded-lg overflow-hidden shadow-sm transition-all duration-300">
+                    <div class="video-thumbnail" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);">
+                        <div class="play-button cursor-pointer">
+                            <div class="play-icon"></div>
+                        </div>
+                        <div class="duration-badge">18:44</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex space-x-3">
+                            <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                TT
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 line-clamp-2 mb-1">
+                                    Latest iPhone Review - Is It Worth the Upgrade?
+                                </h3>
+                                <p class="text-sm text-gray-600 mb-1">Tech Today</p>
+                                <p class="text-sm text-gray-500">924K views • 2 days ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Search functionality
+        document.querySelector('input[type="text"]').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value;
+                if (searchTerm.trim()) {
+                    alert(`Searching for: "${searchTerm}"`);
+                }
+            }
+        });
+
+        // Search button click
+        document.querySelector('button[type="button"]').addEventListener('click', function() {
+            const searchInput = document.querySelector('input[type="text"]');
+            const searchTerm = searchInput.value;
+            if (searchTerm.trim()) {
+                alert(`Searching for: "${searchTerm}"`);
+            }
+        });
+
+        // Category filter functionality
+        document.querySelectorAll('button').forEach(button => {
+            if (button.textContent.match(/^(All|Music|Gaming|Technology|Education|Sports|Comedy)$/)) {
+                button.addEventListener('click', function() {
+                    // Remove active class from all category buttons
+                    document.querySelectorAll('button').forEach(btn => {
+                        if (btn.textContent.match(/^(All|Music|Gaming|Technology|Education|Sports|Comedy)$/)) {
+                            btn.className = btn.className.replace('bg-black text-white', 'bg-gray-200 hover:bg-gray-300');
+                        }
+                    });
+                    
+                    // Add active class to clicked button
+                    this.className = this.className.replace('bg-gray-200 hover:bg-gray-300', 'bg-black text-white');
+                    
+                    alert(`Filtering by: ${this.textContent}`);
+                });
+            }
+        });
+
+        // Play button functionality
+        document.querySelectorAll('.play-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const videoCard = this.closest('.video-card');
+                const videoTitle = videoCard.querySelector('h3').textContent;
+                alert(`Playing: ${videoTitle}`);
+            });
+        });
+
+        // Sidebar navigation
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all sidebar items
+                document.querySelectorAll('.sidebar-item').forEach(sidebarItem => {
+                    sidebarItem.classList.remove('bg-gray-100');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('bg-gray-100');
+                
+                const sectionName = this.querySelector('span').textContent;
+                alert(`Navigating to: ${sectionName}`);
+            });
+        });
+
+        // Video card hover effects
+        document.querySelectorAll('.video-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96973e74505a7a28',t:'MTc1NDIzOTA5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
